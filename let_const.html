@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>let/const</title>
+</head>
+<body>
+    <script>
+    // let let命令，用来声明变量。它的用法类似于var，但是所声明的变量，只在let命令所在的代码块内有效。
+    {
+        let a = 1;
+        var b = 2;
+    }
+    // console.log(a) // ReferenceError: a is not defined.
+    console.log(b) // 1
+
+    for(let i=0; i<10; i++){
+
+    }
+    // console.log(i);
+
+    var a = [];
+    for (var i = 0; i < 10; i++) {
+        a[i] = function () {
+            console.log(i);
+        };
+    }
+    a[6](); 
+
+    var a = [];
+    for (let i = 0; i < 10; i++) {
+        a[i] = function () {
+            console.log(i);
+        };
+    }
+    a[6](); // 6
+
+// 输出了 3 次abc。这表明函数内部的变量i与循环变量i不在同一个作用域，有各自单独的作用域
+    for (let i = 0; i < 3; i++) {
+        let i = 'abc';
+        console.log(i);
+    }
+
+    // 不存在变量提升
+    // 暂时性死区 只要块级作用域内存在let命令，它所声明的变量就“绑定”（binding）这个区域，不再受外部的影响
+    // ES6 明确规定，如果区块中存在let和const命令，这个区块对这些命令声明的变量，从一开始就形成了封闭作用域。凡是在声明之前就使用这些变量，就会报错
+    var tmp = 123;
+    if(1){
+        // tmp = '333';
+        let tmp ;
+        // console.log(tmp);
+    }
+    // console.log(tmp);
+
+    if (true) {
+        // TDZ开始
+        // tmp = 'abc'; // ReferenceError
+        // console.log(tmp); // ReferenceError
+
+        let tmp; // TDZ结束
+        console.log(tmp); // undefined
+
+        tmp = 123;
+        console.log(tmp); // 123
+    }
+
+    // 不允许重复声明 let不允许在相同作用域内，重复声明同一个变量
+
+    // 报错
+    function func() {
+        let a = 10;
+        var a = 1;
+    }
+
+    // 报错
+    function func() {
+        let a = 10;
+        let a = 1;
+    }
+
+
+    // 块作用域
+    function f1() {
+        let n = 5;
+        if (true) {
+            let n = 10;
+        }
+        console.log(n); // 5
+    }
+   
+
+//    do 表达式 块级作用域之前加上do，使它变为do表达式，然后就会返回内部最后执行的表达式的值
+// let x = do {
+//   let t = f();
+//   t * t + 1;
+// };
+
+
+    // const声明一个只读的常量。一旦声明，常量的值就不能改变 必须立即初始化
+    //  const的作用域与let命令相同：只在声明所在的块级作用域内有效
+    // const命令声明的常量也是不提升，同样存在暂时性死区，只能在声明的位置后面使用。
+    const av = [];
+    av.push('Hello'); // 可执行
+    av.length = 0;    // 可执行
+    av = ['Dave'];    // 报错
+
+
+    // 声明变量的六种方式
+    // var fucntion  (es5)  
+    // let const  import class (es6)
+
+    </script>
+    
+</body>
+</html>
