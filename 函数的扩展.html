@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./common.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        
+            // 写法一
+    function m1({x = 0, y = 0} = {}) {
+    return [x, y];
+    }
+
+    // 写法二
+    function m2({x, y} = { x: 0, y: 0 }) {
+    return [x, y];
+    }
+
+        // 函数没有参数的情况
+    m1() // [0, 0]
+    m2() // [0, 0]
+
+    // x 和 y 都有值的情况
+    m1({x: 3, y: 8}) // [3, 8]
+    m2({x: 3, y: 8}) // [3, 8]
+
+    // x 有值，y 无值的情况
+    m1({x: 3}) // [3, 0]
+    m2({x: 3}) // [3, undefined]
+
+    // x 和 y 都无值的情况
+    m1({}) // [0, 0];
+    m2({}) // [undefined, undefined]
+
+    m1({z: 3}) // [0, 0]
+    m2({z: 3}) // [undefined, undefined]
+
+
+    // 函数length属性
+    l((function(a){}).length); //1 
+    l((function(a=4){}).length); //0 指定了默认值后，length属性将失真
+    
+    
+    
+    
+    // 一旦设置了参数的默认值，函数进行声明初始化时，参数会形成一个单独的作用域（context）。等到初始化结束，这个作用域就会消失
+    var x = 1;
+    function test(x,y=x){
+        l(y);
+    }
+    test(2); //2
+
+
+    let x2 = 100;
+    function test2(y=x2){
+        let x2 = 2;
+        l(y);
+    }
+    test2();
+    
+    
+    // rest 参数 
+    // rest 参数搭配的变量是一个数组，该变量将多余的参数放入数组中
+    function add(...values) {
+        let sum = 0;
+
+        for (var val of values) {
+            sum += val;
+        }
+
+        return sum;
+    }
+
+    add(2, 5, 3) // 10
+    
+    // 箭头函数
+    // （1）函数体内的this对象，就是定义时所在的对象，而不是使用时所在的对象。
+    // （2）不可以当作构造函数，也就是说，不可以使用new命令，否则会抛出一个错误。
+    // （3）不可以使用arguments对象，该对象在函数体内不存在。如果要用，可以用 rest 参数代替。
+    // （4）不可以使用yield命令，因此箭头函数不能用作 Generator 函数
+    
+    function foo(){
+        setTimeout(() => {
+            l('id:'+this.id);
+        }, 100);
+    }
+    var id = 110;
+    foo.call({id: 119});
+    
+
+    function Timer() {
+        this.s1 = 0;
+        this.s2 = 0;
+        // 箭头函数
+        setInterval(() => this.s1++, 1000);
+        // 普通函数
+        setInterval(function () {
+            this.s2++;
+        }, 1000);
+    }
+
+    var timer = new Timer();
+
+    setTimeout(() => console.log('s1: ', timer.s1), 3100);
+    setTimeout(() => console.log('s2: ', timer.s2), 3100);
+    // s1: 3
+    // s2: 0
+
+
+    // this指向的固定化，并不是因为箭头函数内部有绑定this的机制，实际原因是箭头函数根本没有自己的this，导致内部的this就是外层代码块的this。正是因为它没有this，所以也就不能用作构造函数
+    // 由于箭头函数没有自己的this，所以当然也就不能用call()、apply()、bind()这些方法去改变this的指向
+    
+    
+    
+    
+    
+    
+    
+    
+    // 函数绑定运算符是并排的两个冒号（::），双冒号左边是一个对象，右边是一个函数。该运算符会自动将左边的对象，作为上下文环境（即this对象），绑定到右边的函数上面。
+    // foo::bar;
+    // // 等同于
+    // bar.bind(foo);
+
+    // foo::bar(...arguments);
+    // // 等同于
+    // bar.apply(foo, arguments);
+
+    // const hasOwnProperty = Object.prototype.hasOwnProperty;
+    // function hasOwn(obj, key) {
+    //     return obj::hasOwnProperty(key);
+    // }
+    
+    
+    // 尾调用
+//     function f(x){
+//   return g(x); 函数f的最后一步是调用函数g，这就叫尾调用
+// }
+    
+    // 尾递归 
+    // 函数调用自身，称为递归。如果尾调用自身，就称为尾递归
+
+    function factorial(n) {
+        if (n === 1) return 1;
+        return n * factorial(n - 1);
+    }
+
+    factorial(5) // 120 复杂度（n）
+
+    // 优化 递归非常耗费内存，因为需要同时保存成千上百个调用帧，很容易发生“栈溢出”错误（stack overflow）。但对于尾递归来说，由于只存在一个调用帧，所以永远不会发生“栈溢出”错误
+    function factorial2(n,total){
+        if(n === 1) return total;
+        return factorial2(n-1,n*total); 
+    }
+    l(factorial2(5,1)); // 120 复杂度（1） ES6 中只要使用尾递归，就不会发生栈溢出，相对节省内存。
+    
+    // ES6 的尾调用优化只在严格模式下开启，正常模式是无效的
+    // 柯里化 意思是将多参数的函数转换成单参数的形式
+
+    
+    </script>
+    
+</body>
+
+</html>
