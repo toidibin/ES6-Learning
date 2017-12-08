@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./common.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <script>
+    // 对象简洁表示法  *****
+    const foo2 = 'ddd';
+    const baz = {foo2};  //ES6 允许在对象之中，直接写变量。这时，属性名为变量名, 属性值为变量的值
+    // 属性的赋值器（setter）和取值器（getter），事实上也是采用这种写法。
+    const cart = {
+        _wheels: 4,
+
+        get wheels () {
+            return this._wheels;
+        },
+
+        set wheels (value) {
+            if (value < this._wheels) {
+            throw new Error('数值太小了！');
+            }
+            this._wheels = value;
+        }
+    }
+    
+    
+    // 属性名表达式 ******
+    let propKey = 'foo';
+    let obj = {
+        [propKey]: true,
+        ['a' + 'bc']: 123
+    };
+    // 属性名表达式与简洁表示法，不能同时使用，会报错
+    const foo = 'bar';
+    const bar = 'abc';
+    // const baz = {[foo]};报错
+    const baz2 = { [foo] : 'abc'}
+
+
+    // 方法name 属性 *****
+    const person = {
+        sayName() {
+            console.log('hello!');
+        },
+    };
+    person.sayName.name   // "sayName"
+// 如果对象的方法使用了取值函数（getter）和存值函数（setter），则name属性不是在该方法上面，而是该方法的属性的描述对象的get和set属性上面，返回值是方法名前加上get和set
+    const obj2 = {
+        get foo() {},
+        set foo(x) {}
+    };
+
+    // obj2.foo.name
+    // TypeError: Cannot read property 'name' of undefined
+
+    const descriptor = Object.getOwnPropertyDescriptor(obj2, 'foo');
+
+    descriptor.get.name // "get foo"
+    descriptor.set.name // "set foo"
+    // 如果对象的方法是一个 Symbol 值，那么name属性返回的是这个 Symbol 值的描述
+    const k1 = Symbol('description');
+    const k2 = Symbol();
+    let obj3 = {
+        [k1] () {},
+        [k2] () {}
+    };
+    obj3[k1].name // "[description]"
+    obj3[k2].name // ""
+    
+
+
+
+    // Object.is() 
+    // es5 缺陷：== | === 前者会自动转换数据类型，后者的NaN不等于自身，以及+0等于-0
+    // is（）用来比较两个值是否严格相等跟 ===基本一致  不同之处只有两个：一是+0不等于-0，二是NaN等于自身
+     l(Object.is(+0,-0));  //false
+     l(Object.is(NaN,NaN));  //true
+    
+    
+    // Object.assign()
+    // 对象的合并，将源对象的所有可枚举 复制到目标对象
+    const target = {a: 1};
+    const source1 = {b: 2};
+    const source2 = {c: 3};
+    Object.assign(target, source1, source2);
+    console.dir(target);
+    
+    // Object.assign拷贝的属性是有限制的，只拷贝源对象的自身属性（不拷贝继承属性），也不拷贝不可枚举的属性（enumerable: false）
+    // 浅拷贝  Object.assign方法实行的是浅拷贝，也就是说，如果源对象某个属性的值是对象，那么目标对象拷贝得到的是这个对象的引用。
+    // Object.assign可以用来处理数组，但是会把数组视为对象
+    Object.assign([1,3,4],[4,5]); // [4,5,4]
+    // assign常见用途
+    // 1 为对象添加属性
+    class Point{
+        constructor(x,y){
+            Object.assign(this,{x,y}); //通过Object.assign方法，将x属性和y属性添加到Point类的对象实例
+        }
+    }
+    // 2 为对象添加方法
+    // Object.assign(SomeClass.prototype,{
+    //     somemethod(x,y){}
+    // })
+    // 等同
+    // SomeClass.prototype.someMethod = function (x,y) {};
+    // 3 克隆对象
+    function clone(origin){
+        return Object.assign({},origin); //采用这种方法克隆，只能克隆原始对象自身的值，不能克隆它继承的值
+    }
+    function clone2 (origin){
+        let originProto = Object.getPrototypeOf(origin);
+        return Object.assign(Object.create(originProto), origin); //继承
+    }
+    // （4）合并多个对象
+    // （5）为属性指定默认值
+    const DEFAULT = {
+        logLevel: 0,
+        method: 'get'
+    }
+    function pro(options){
+        options = Object.assign({},DEFAULT,options);
+    }
+
+
+
+
+    // 属性的可枚举性和遍历
+    // 可枚举性 
+    // 对象的每个属性都有一个描述对象，用来控制该属性的行为 Object.getOwnPropertyDescriptor方法可以获取该属性的描述对象。
+    let obj4 = { foo: 123};
+    console.dir(Object.getOwnPropertyDescriptor(obj4,'foo'));
+    //  {
+    //    value: 123,
+    //    writable: true,
+    //    enumerable: true,
+    //    configurable: true
+    //  }
+
+    // 目前四个操作会忽略 enumable 为false的属性
+    // for...in 循环 只遍历对象自身和继承的可枚举的属性
+    // Objects.keys() 返回对象自身的所有可枚举的属性的键名
+    // JSON.stringify()：只串行化对象自身的可枚举的属性
+    // Object.assign()： 忽略enumerable为false的属性，只拷贝对象自身的可枚举的属性。
+
+    // 属性的遍历
+    // 1 for ... in  for...in循环遍历对象自身的和继承的可枚举属性（不含 Symbol 属性）
+    // 2 Object.keys(obj)  Object.keys返回一个数组，包括对象自身的（不含继承的）所有可枚举属性（不含 Symbol 属性）的键名。
+    // 3 Object.getOwnPropertyNames(obj) 返回一个数组，包含对象自身的所有属性（不含 Symbol 属性，但是包括不可枚举属性）的键名
+    // 4 Object.getOwnPropertySymbols(obj) 返回一个数组，包含对象自身的所有 Symbol 属性的键名
+    // 5 Reflect.ownKeys(obj) 返回一个数组，包含对象自身的所有键名，不管键名是 Symbol 或字符串，也不管是否可枚举
+
+    // 以上的 5 种方法遍历对象的键名，都遵守同样的属性遍历的次序规则。
+    // 首先遍历所有数值键，按照数值升序排列。
+    // 其次遍历所有字符串键，按照加入时间升序排列。
+    // 最后遍历所有 Symbol 键，按照加入时间升序排列。
+
+
+
+    // Object.getOwnPropertyDescriptors() 方法会返回某个对象属性的描述对象（descriptor）所有原对象的属性名都是该对象的属性名，对应的属性值就是该属性的描述对象
+    // 为了解决Object.assign()无法正确拷贝get属性和set属性的问题。
+    const source = {
+        set foo(value) {
+            console.log(value);
+        }
+    };
+    const target2 = {};
+    Object.defineProperties(target2, Object.getOwnPropertyDescriptors(source));
+    Object.getOwnPropertyDescriptor(target2, 'foo')
+    // { get: undefined,
+    //   set: [Function: set foo],
+    //   enumerable: true,
+    //   configurable: true }
+
+
+
+    // __proto__属性  Object.setPrototypeOf()   Object.getPrototypeOf()
+    // __proto__ 用来读取或设置当前对象的prototype对象  无论从语义的角度，还是从兼容性的角度，都不要使用这个属性 而是使用下面的Object.setPrototypeOf()（写操作）、Object.getPrototypeOf()（读操作）、Object.create()（生成操作）代替。
+    // es6 的写法
+    const obj = {
+        method: function() {  }
+    };
+    obj.__proto__ = someOtherObj;
+
+    // es5 的写法
+    var obj = Object.create(someOtherObj);
+    obj.method = function() {  };
+
+    // Object.setPrototypeOf()  作用与__proto__相同，用来设置一个对象的prototype对象，返回参数对象本身
+    // 格式
+    Object.setPrototypeOf(object, prototype)
+    // 用法
+    const o = Object.setPrototypeOf({}, null);
+
+    // 如果第一个参数不是对象，会自动转为对象。但是由于返回的还是第一个参数，所以这个操作不会产生任何效果。
+    Object.setPrototypeOf(1, {}) === 1 // true
+    Object.setPrototypeOf('foo', {}) === 'foo' // true
+    Object.setPrototypeOf(true, {}) === true // true
+    // 由于undefined和null无法转为对象，所以如果第一个参数是undefined或null，就会报错。
+
+    // Object.getProtoOf() 该方法与Object.setPrototypeOf方法配套，用于读取一个对象的原型对象
+
+
+
+    // super 关键字
+    // this关键字总是指向函数所在的当前对象，ES6 又新增了另一个类似的关键字super，指向当前对象的原型对象
+    // avaScript 引擎内部，super.foo等同于Object.getPrototypeOf(this).foo（属性）或Object.getPrototypeOf(this).foo.call(this)
+
+
+    // **** Object.keys()  Object.values()  Object.entries()
+
+
+    // *** 对象的扩展运算符
+    // 1 解构赋值
+    let { x, y, ...z } = { x: 1, y: 2, a: 3, b: 4 };
+    // 2 扩展运算符（...）用于取出参数对象的所有可遍历属性，拷贝到当前对象之中
+    let z = { a: 3, b: 4 };
+    let n = { ...z };
+    n // { a: 3, b: 4 }
+
+
+    // null传导运算符 引入了“Null 传导运算符”（null propagation operator）?.
+    // obj?.prop // 读取对象属性
+    // obj?.[expr] // 同上
+    // func?.(...args) // 函数或对象方法的调用
+    // new C?.(...args) // 构造函数的调用
+    // 如果 a 是 null 或 undefined, 返回 undefined
+    // 否则返回 a.b.c().d
+        a?.b.c().d
+
+        // 如果 a 是 null 或 undefined，下面的语句不产生任何效果
+        // 否则执行 a.b = 42
+        a?.b = 42
+
+        // 如果 a 是 null 或 undefined，下面的语句不产生任何效果
+        delete a?.b
+    </script>
+</body>
+</html>
