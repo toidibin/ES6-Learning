@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<!-- 
+    是什么？
+        ES6提供了新的数据结构 Set 类似数组但成员都是唯一的没有重复值
+        属性
+            Set.prototype.construct: 构造函数，默认就是Set函数
+            Set.prototype.size : 返回Set实例的成员总数
+        方法
+            add(value)：添加某个值，返回 Set 结构本身。
+            delete(value)：删除某个值，返回一个布尔值，表示删除是否成功。
+            has(value)：返回一个布尔值，表示该值是否为Set的成员。
+            clear()：清除所有成员，没有返回值。
+
+    怎么用？
+        Set() 可以接受一个数组（或有iterable接口的其他数据结构)作为参数用来初始化。 
+        向 Set 加入值的时候，不会发生类型转换  ,类似于精确相等运算符（===），主要的区别是NaN等于自身
+ -->
+
+<body>
+    <script>
+        // 例一
+        const set = new Set([1, 2, 3, 4, 4]);
+        [...set]
+        // [1, 2, 3, 4]
+
+        // 例二
+        const items = new Set([1, 2, 3, 4, 5, 5, 5, 5]);
+        items.size // 5
+
+        // 例三
+        function divs() {
+            return [...document.querySelectorAll('div')];
+        }
+
+        // 去除数组的重复成员
+        [...new Set(array)] 
+    </script>
+</body>
+
+</html>
